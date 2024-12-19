@@ -10,7 +10,8 @@ onRecordAfterCreateSuccess((e) => {
         const course = courses[i];
 
         // Create a user_course_progress entry
-        const ucProgress = $app.newRecord("user_course_progress");
+        const collection = $app.findCollectionByNameOrId("user_course_progress");
+        const ucProgress = new Record(collection);
         ucProgress.set("user", userId);
         ucProgress.set("course", course.get("id"));
         ucProgress.set("completed", false);
@@ -24,7 +25,8 @@ onRecordAfterCreateSuccess((e) => {
         const tutorial = tutorials[i];
 
         // Create a user_tutorial_progress entry
-        const utProgress = $app.newRecord("user_tutorial_progress");
+        const tutorialCollection = $app.findCollectionByNameOrId("user_tutorial_progress");
+        const utProgress = new Record(tutorialCollection);
         utProgress.set("user", userId);
         utProgress.set("tutorial", tutorial.get("id"));
         utProgress.set("completed", false);
