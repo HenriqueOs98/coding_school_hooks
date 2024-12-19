@@ -30,12 +30,10 @@ onRecordCreateRequest((e) => {
         const collection = $app.findCollectionByNameOrId("user_course_progress");
         const progress = new Record(collection);
 
-        // Set the fields
-        progress.loadData({
-            "user": user.id,
-            "course": course.id,
-            "completed": false
-        });
+        // Set the fields one by one
+        progress.set("user", user.id);
+        progress.set("course", course.id);
+        progress.set("completed", false);
 
         // Save the record
         $app.save(progress);
