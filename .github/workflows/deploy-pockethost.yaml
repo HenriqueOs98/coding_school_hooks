@@ -22,9 +22,9 @@ jobs:
           username: ${{ secrets.ftp_username }}
           password: ${{ secrets.ftp_password }}
           local-dir: ./
-          server-dir: ./${{ secrets.app_name }}/
+          server-dir: /${{ secrets.app_name }}/
           log-level: verbose
-          state-name: coding-platform/pb_hooks/.ftp-deploy-sync-state.json
+          state-name: /pb_hooks/.ftp-deploy-sync-state.json
           exclude: |
             **/.git*
             **/.git*/**
