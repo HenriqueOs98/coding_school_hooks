@@ -21,7 +21,7 @@ onRecordCreateRequest((e) => {
                 courseProgress.set("user", record.id);
                 courseProgress.set("course", course.id);
                 courseProgress.set("completed", false);
-                $app.saveRecord(courseProgress);
+                $app.dao().saveRecord(courseProgress);
 
                 // Get tutorials for this course
                 const tutorials = $app.findRecordsByFilter(
@@ -38,7 +38,7 @@ onRecordCreateRequest((e) => {
                     tutorialProgress.set("user", record.id);
                     tutorialProgress.set("tutorial", tutorial.id);
                     tutorialProgress.set("completed", false);
-                    $app.saveRecord(tutorialProgress);
+                    $app.dao().saveRecord(tutorialProgress);
                 });
             } catch (err) {
                 console.error("Error creating progress for course:", course.id, err);
