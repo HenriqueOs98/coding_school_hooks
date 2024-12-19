@@ -1,5 +1,5 @@
 // Hook that runs after a user is created
-onRecordAfterCreateSuccess(async (e) => {
+onRecordCreateRequest(async (e) => {
     const { collection, record } = e;
 
     // Only run for users collection
