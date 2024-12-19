@@ -17,11 +17,12 @@ onRecordCreateRequest((e) => {
         courses.forEach((course) => {
             try {
                 // Create course progress
-                $app.records().create("user_course_progress", {
-                    user: record.id,
-                    course: course.id,
-                    completed: false
-                });
+                const collection = $app.findCollectionByNameOrId("user_course_progress");
+                const courseProgress = new Record(collection);
+                courseProgress.set("user", record.id);
+                courseProgress.set("course", course.id);
+                courseProgress.set("completed", false);
+                $app.save(courseProgress);
 
                 // Get tutorials for this course
                 const tutorials = $app.findRecordsByFilter(
@@ -33,11 +34,12 @@ onRecordCreateRequest((e) => {
 
                 // Create tutorial progress
                 tutorials.forEach((tutorial) => {
-                    $app.records().create("user_tutorial_progress", {
-                        user: record.id,
-                        tutorial: tutorial.id,
-                        completed: false
-                    });
+                    const tutorialCollection = $app.findCollectionByNameOrId("user_tutorial_progress");
+                    const tutorialProgress = new Record(tutorialCollection);
+                    tutorialProgress.set("user", record.id);
+                    tutorialProgress.set("tutorial", tutorial.id);
+                    tutorialProgress.set("completed", false);
+                    $app.save(tutorialProgress);
                 });
             } catch (err) {
                 console.error("Error creating progress for course:", course.id, err);
