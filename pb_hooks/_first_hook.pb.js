@@ -1,48 +1,43 @@
-onRecordCreateRequest(async (e) => {
-    const user = e.record;
-    console.log("New user created:", user.id);
+/// <reference path="../types.d.ts" />
 
+onRecordCreateRequest((e) => {
     try {
+        const record = e.record;
+        if (!record) return e.next();
+
         // Get all courses
-        const courses = await $app.dao().findRecordsByFilter(
-            'courses',
-            null,
-            null,
-            null,
-            0,
-            null
-        );
+        const courses = $app.collection('courses').getFullList();
 
-        // Create user_course_progress for each course
-        for (const course of courses) {
-            await $app.dao().saveRecord($app.dao().newRecord('user_course_progress', {
-                user: user.id,
-                course: course.id,
-                completed: false,
-            }));
+        // For each course, create a progress record
+        courses.forEach(async (course) => {
+            try {
+                await $app.collection('user_course_progress').create({
+                    user: record.id,
+                    course: course.id,
+                    completed: false
+                });
 
-            // Get all tutorials for this course
-            const tutorials = await $app.dao().findRecordsByFilter(
-                'tutorials',
-                `course = "${course.id}"`,
-                null,
-                null,
-                0,
-                null
-            );
+                // Get tutorials for this course
+                const tutorials = await $app.collection('tutorials').getFullList({
+                    filter: `course = "${course.id}"`
+                });
 
-            // Create user_tutorial_progress for each tutorial
-            for (const tutorial of tutorials) {
-                await $app.dao().saveRecord($app.dao().newRecord('user_tutorial_progress', {
-                    user: user.id,
-                    tutorial: tutorial.id,
-                    completed: false,
-                }));
+                // Create progress for each tutorial
+                tutorials.forEach(async (tutorial) => {
+                    await $app.collection('user_tutorial_progress').create({
+                        user: record.id,
+                        tutorial: tutorial.id,
+                        completed: false
+                    });
+                });
+            } catch (err) {
+                console.error("Error creating progress for course:", course.id, err);
             }
-        }
+        });
 
-        console.log("Successfully initialized progress records for user:", user.id);
-    } catch (error) {
-        console.error("Error initializing progress records:", error);
+        return e.next();
+    } catch (err) {
+        console.error("Error in user creation hook:", err);
+        return e.next();
     }
 }, "users")
