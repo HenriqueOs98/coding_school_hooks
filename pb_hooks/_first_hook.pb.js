@@ -1,4 +1,4 @@
-onRecordAfterCreateRequest(async (e) => {
+onRecordCreateRequest(async (e) => {
     const user = e.record;
     console.log("New user created:", user.id);
 
