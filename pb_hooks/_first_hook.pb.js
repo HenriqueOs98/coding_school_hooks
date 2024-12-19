@@ -17,13 +17,11 @@ onRecordCreateRequest((e) => {
         courses.forEach((course) => {
             try {
                 // Create course progress
-                const collection = $app.findCollectionByNameOrId("user_course_progress");
-                const courseProgress = new Record(collection, {
+                $app.records().create("user_course_progress", {
                     user: record.id,
                     course: course.id,
                     completed: false
                 });
-                $app.dao().saveRecord(courseProgress);
 
                 // Get tutorials for this course
                 const tutorials = $app.findRecordsByFilter(
@@ -35,15 +33,11 @@ onRecordCreateRequest((e) => {
 
                 // Create tutorial progress
                 tutorials.forEach((tutorial) => {
-                    const tutorialProgress = new Record(
-                        $app.findCollectionByNameOrId("user_tutorial_progress"), 
-                        {
-                            user: record.id,
-                            tutorial: tutorial.id,
-                            completed: false
-                        }
-                    );
-                    $app.dao().saveRecord(tutorialProgress);
+                    $app.records().create("user_tutorial_progress", {
+                        user: record.id,
+                        tutorial: tutorial.id,
+                        completed: false
+                    });
                 });
             } catch (err) {
                 console.error("Error creating progress for course:", course.id, err);
