@@ -18,13 +18,13 @@ onRecordCreateRequest((e) => {
             try {
                 // Create course progress
                 const courseProgress = new Record(
-                    $app.findCollectionByNameOrId("user_course_progress")
+                    $app.findCollectionByNameOrId("user_course_progress"),
+                    {
+                        "user": record.id,
+                        "course": course.id,
+                        "completed": false
+                    }
                 );
-                courseProgress.data = {
-                    "user": record.id,
-                    "course": course.id,
-                    "completed": false
-                };
                 $app.save(courseProgress);
 
                 // Get tutorials for this course
@@ -38,13 +38,13 @@ onRecordCreateRequest((e) => {
                 // Create tutorial progress
                 tutorials.forEach((tutorial) => {
                     const tutorialProgress = new Record(
-                        $app.findCollectionByNameOrId("user_tutorial_progress")
+                        $app.findCollectionByNameOrId("user_tutorial_progress"),
+                        {
+                            "user": record.id,
+                            "tutorial": tutorial.id,
+                            "completed": false
+                        }
                     );
-                    tutorialProgress.data = {
-                        "user": record.id,
-                        "tutorial": tutorial.id,
-                        "completed": false
-                    };
                     $app.save(tutorialProgress);
                 });
             } catch (err) {
