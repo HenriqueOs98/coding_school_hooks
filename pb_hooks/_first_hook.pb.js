@@ -6,29 +6,42 @@ onRecordCreateRequest((e) => {
         if (!record) return e.next();
 
         // Get all courses
-        const courses = $app.collection('courses').getFullList();
+        const courses = $app.findRecordsByFilter(
+            "courses",
+            "",  // empty filter to get all
+            null, // no sorting
+            100   // limit to 100 courses
+        );
 
         // For each course, create a progress record
-        courses.forEach(async (course) => {
+        courses.forEach((course) => {
             try {
-                await $app.collection('user_course_progress').create({
-                    user: record.id,
-                    course: course.id,
-                    completed: false
-                });
+                // Create course progress
+                const courseProgress = new Record(
+                    $app.findCollectionByNameOrId("user_course_progress")
+                );
+                courseProgress.set("user", record.id);
+                courseProgress.set("course", course.id);
+                courseProgress.set("completed", false);
+                $app.save(courseProgress);
 
                 // Get tutorials for this course
-                const tutorials = await $app.collection('tutorials').getFullList({
-                    filter: `course = "${course.id}"`
-                });
+                const tutorials = $app.findRecordsByFilter(
+                    "tutorials",
+                    `course = "${course.id}"`,
+                    null,
+                    100
+                );
 
-                // Create progress for each tutorial
-                tutorials.forEach(async (tutorial) => {
-                    await $app.collection('user_tutorial_progress').create({
-                        user: record.id,
-                        tutorial: tutorial.id,
-                        completed: false
-                    });
+                // Create tutorial progress
+                tutorials.forEach((tutorial) => {
+                    const tutorialProgress = new Record(
+                        $app.findCollectionByNameOrId("user_tutorial_progress")
+                    );
+                    tutorialProgress.set("user", record.id);
+                    tutorialProgress.set("tutorial", tutorial.id);
+                    tutorialProgress.set("completed", false);
+                    $app.save(tutorialProgress);
                 });
             } catch (err) {
                 console.error("Error creating progress for course:", course.id, err);
