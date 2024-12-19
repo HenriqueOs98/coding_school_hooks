@@ -1,47 +1,37 @@
-/// <reference path="../types.d.ts" />
+/// <reference path="../pb_data/types.d.ts" />
 
-/**
- * @typedef {import('./types').Collections} Collections
- * @typedef {import('./types').UserCourseProgressRecord} UserCourseProgressRecord
- * @typedef {import('./types').UserTutorialProgressRecord} UserTutorialProgressRecord
- */
+// This hook runs after a user is successfully created
+onRecordAfterCreateSuccess((e) => {
+    const userId = e.record.get("id");
 
-onRecordCreateRequest((e) => {
-    try {
-        const user = e.record;
-        if (!user) return e.next();
+    // Fetch all courses
+    const courses = $app.findRecordsByFilter("courses", "", []);
+    for (let i = 0; i < courses.length; i++) {
+        const course = courses[i];
 
-        console.log("Creating progress for user:", user.id);
+        // Create a user_course_progress entry
+        const ucProgress = $app.newRecord("user_course_progress");
+        ucProgress.set("user", userId);
+        ucProgress.set("course", course.get("id"));
+        ucProgress.set("completed", false);
 
-        // Get first course
-        const course = $app.findFirstRecordByFilter(
-            "courses",
-            "" // empty filter to get any course
-        );
-
-        if (!course) {
-            console.log("No courses found");
-            return e.next();
-        }
-
-        console.log("Found course:", course.id);
-
-        // Create one course progress record
-        const collection = $app.findCollectionByNameOrId("user_course_progress");
-        const progress = new Record(collection);
-
-        // Set the fields one by one
-        progress.set("user", user.id);
-        progress.set("course", course.id);
-        progress.set("completed", false);
-
-        // Save the record
-        $app.save(progress);
-        console.log("Created progress record");
-
-        return e.next();
-    } catch (err) {
-        console.error("Error in user creation hook:", err);
-        return e.next();
+        $app.dao().saveRecord(ucProgress);
     }
+
+    // Fetch all tutorials
+    const tutorials = $app.findRecordsByFilter("tutorials", "", []);
+    for (let i = 0; i < tutorials.length; i++) {
+        const tutorial = tutorials[i];
+
+        // Create a user_tutorial_progress entry
+        const utProgress = $app.newRecord("user_tutorial_progress");
+        utProgress.set("user", userId);
+        utProgress.set("tutorial", tutorial.get("id"));
+        utProgress.set("completed", false);
+
+        $app.dao().saveRecord(utProgress);
+    }
+
+    // Call e.next() to continue the execution chain
+    e.next();
 }, "users");
