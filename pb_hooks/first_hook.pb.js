@@ -7,29 +7,7 @@ onRecordCreateRequest((e) => {
         if (!record) return e.next();
 
         // Find all meta fields and their corresponding file fields
-        const fields = Obj
-        // This runs before a record is created
-        onRecordBeforeCreate((e) => {
-            const collection = e.collection
-            const record = e.record
-        
-            $log.info(`About to create record in collection "${collection.name}"`)
-            $log.debug("Record data:", record)
-        
-            e.next()
-        })
-        
-        // This runs after a record is successfully created
-        onRecordAfterCreate((e) => {
-            const collection = e.collection
-            const record = e.record
-        
-            $log.info(`Successfully created record with ID ${record.id} in collection "${collection.name}"`)
-            
-            // You can access all the record data
-            $log.debug("Created record data:", record)
-        })
-        ect.keys(record.fieldsData());
+        const fields = Object.keys(record.fieldsData());
         const metaFields = fields.filter(field => field.endsWith('_meta'));
         
         // Early return if no meta fields found
