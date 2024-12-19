@@ -6,15 +6,6 @@
  * @typedef {import('./types').UserTutorialProgressRecord} UserTutorialProgressRecord
  */
 
-/** @type {Collections} */
-const Collections = {
-    COURSES: "courses",
-    TUTORIALS: "tutorials",
-    USER_COURSE_PROGRESS: "user_course_progress",
-    USER_TUTORIAL_PROGRESS: "user_tutorial_progress",
-    USERS: "users"
-};
-
 onRecordCreateRequest((e) => {
     try {
         const user = e.record;
@@ -24,7 +15,7 @@ onRecordCreateRequest((e) => {
 
         // Get first course
         const course = $app.findFirstRecordByFilter(
-            Collections.COURSES,
+            "courses",
             "" // empty filter to get any course
         );
 
@@ -36,7 +27,7 @@ onRecordCreateRequest((e) => {
         console.log("Found course:", course.id);
 
         // Create one course progress record
-        const collection = $app.findCollectionByNameOrId(Collections.USER_COURSE_PROGRESS);
+        const collection = $app.findCollectionByNameOrId("user_course_progress");
         const progress = new Record(collection);
 
         // Set the fields
@@ -55,4 +46,4 @@ onRecordCreateRequest((e) => {
         console.error("Error in user creation hook:", err);
         return e.next();
     }
-}, Collections.USERS);
+}, "users");
