@@ -1,4 +1,3 @@
-/// <reference path="../types.d.ts" />
 
 // Fires before the record is created
 onRecordCreateRequest((e) => {
