@@ -1,6 +1,6 @@
 /// <reference path="../types.d.ts" />
 
-onRecordAfterCreateRequest((e) => {
+onRecordCreateRequest((e) => {
     try {
         const user = e.record;
         if (!user) return e.next();
