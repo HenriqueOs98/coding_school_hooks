@@ -1,5 +1,3 @@
-/// <reference path="../types.d.ts" />
-
 // Fires before the record is created
 onRecordCreateRequest((e) => {
     console.log("Hello, World!");
