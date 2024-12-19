@@ -20,9 +20,11 @@ onRecordCreateRequest((e) => {
                 const courseProgress = new Record(
                     $app.findCollectionByNameOrId("user_course_progress")
                 );
-                courseProgress.set("user", record.id);
-                courseProgress.set("course", course.id);
-                courseProgress.set("completed", false);
+                courseProgress.data = {
+                    "user": record.id,
+                    "course": course.id,
+                    "completed": false
+                };
                 $app.save(courseProgress);
 
                 // Get tutorials for this course
@@ -38,9 +40,11 @@ onRecordCreateRequest((e) => {
                     const tutorialProgress = new Record(
                         $app.findCollectionByNameOrId("user_tutorial_progress")
                     );
-                    tutorialProgress.set("user", record.id);
-                    tutorialProgress.set("tutorial", tutorial.id);
-                    tutorialProgress.set("completed", false);
+                    tutorialProgress.data = {
+                        "user": record.id,
+                        "tutorial": tutorial.id,
+                        "completed": false
+                    };
                     $app.save(tutorialProgress);
                 });
             } catch (err) {
