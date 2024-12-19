@@ -1,57 +1,58 @@
 /// <reference path="../types.d.ts" />
 
+/**
+ * @typedef {import('./types').Collections} Collections
+ * @typedef {import('./types').UserCourseProgressRecord} UserCourseProgressRecord
+ * @typedef {import('./types').UserTutorialProgressRecord} UserTutorialProgressRecord
+ */
+
+/** @type {Collections} */
+const Collections = {
+    COURSES: "courses",
+    TUTORIALS: "tutorials",
+    USER_COURSE_PROGRESS: "user_course_progress",
+    USER_TUTORIAL_PROGRESS: "user_tutorial_progress",
+    USERS: "users"
+};
+
 onRecordCreateRequest((e) => {
     try {
         const user = e.record;
         if (!user) return e.next();
 
-        $app.runInTransaction((txApp) => {
-            // Get all courses
-            const courses = txApp.findRecordsByFilter(
-                "courses",
-                "",  // empty filter to get all
-                null, // no sorting
-                100   // limit to 100 courses
-            );
+        console.log("Creating progress for user:", user.id);
 
-            // For each course, create a progress record
-            courses.forEach((course) => {
-                try {
-                    // Create course progress
-                    const collection = txApp.findCollectionByNameOrId("user_course_progress");
-                    const courseProgress = new Record(collection);
-                    courseProgress.set("user", user.id);
-                    courseProgress.set("course", course.id);
-                    courseProgress.set("completed", false);
-                    txApp.save(courseProgress);
+        // Get first course
+        const course = $app.findFirstRecordByFilter(
+            Collections.COURSES,
+            "" // empty filter to get any course
+        );
 
-                    // Get tutorials for this course
-                    const tutorials = txApp.findRecordsByFilter(
-                        "tutorials",
-                        `course = "${course.id}"`,
-                        null,
-                        100
-                    );
+        if (!course) {
+            console.log("No courses found");
+            return e.next();
+        }
 
-                    // Create tutorial progress
-                    tutorials.forEach((tutorial) => {
-                        const tutorialCollection = txApp.findCollectionByNameOrId("user_tutorial_progress");
-                        const tutorialProgress = new Record(tutorialCollection);
-                        tutorialProgress.set("user", user.id);
-                        tutorialProgress.set("tutorial", tutorial.id);
-                        tutorialProgress.set("completed", false);
-                        txApp.save(tutorialProgress);
-                    });
-                } catch (err) {
-                    console.error("Error creating progress for course:", course.id, err);
-                    throw err; // Re-throw to rollback transaction
-                }
-            });
+        console.log("Found course:", course.id);
+
+        // Create one course progress record
+        const collection = $app.findCollectionByNameOrId(Collections.USER_COURSE_PROGRESS);
+        const progress = new Record(collection);
+
+        // Set the fields
+        progress.loadData({
+            "user": user.id,
+            "course": course.id,
+            "completed": false
         });
+
+        // Save the record
+        $app.save(progress);
+        console.log("Created progress record");
 
         return e.next();
     } catch (err) {
         console.error("Error in user creation hook:", err);
         return e.next();
     }
-}, "users");
+}, Collections.USERS);
